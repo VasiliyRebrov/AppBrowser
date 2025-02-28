@@ -21,3 +21,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "AppBrowser"
 include(":app")
+include(":commons")
+include(":data-appinfos-api")
+include(":feature-appinfos-api")
+include(":feature-commons-api")
+include(":feature-commons-impl")
