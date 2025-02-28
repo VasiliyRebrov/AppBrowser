@@ -18,8 +18,8 @@ abstract class FeatureImpl<in Ti, out To>: Feature<Ti, To> {
 
     override fun invoke(params: Ti): Flow<Result<To>> {
         return execute(params)
-            .catch { ex -> emit(value = Result.Error(ex)) }
-            .flowOn(coroutineDispatcher)
+            .catch { throwable -> emit(value = Result.error(throwable)) }
+            .flowOn(this.coroutineDispatcher)
     }
 
     protected abstract fun execute(params: Ti): Flow<Result<To>>

@@ -9,7 +9,7 @@ interface AppInfosRepo {
 
 // MARK: - Methods
 
-    fun getAppInfosPublisher(): StateFlow<Result<Map<AppPackageName, AppInfo>>>
+    fun getAppInfosPublisher(): StateFlow<Result<List<AppInfo>>>
 
     fun updateAppInfo(appPackageName: AppPackageName)
 

@@ -4,6 +4,11 @@ package com.example.commons.result
 
 sealed class Result<out To> {
 
+// MARK: - Properties
+
+    val successData: To?
+        get() = (this as? Success)?.data
+
 // MARK: - Methods
 
     inline fun <R> fold(
@@ -21,8 +26,8 @@ sealed class Result<out To> {
 
     override fun toString(): String {
         return when (this) {
-            is Success<*> -> "Success[data=$data]"
-            is Error -> "Error[throwable=$throwable]"
+            is Success<*> -> "Success[data=${this.data}]"
+            is Error -> "Error[throwable=${this.throwable}]"
             is Loading -> "Loading"
         }
     }

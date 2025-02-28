@@ -1,20 +1,17 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.example.appbrowser"
+    namespace = "com.example.feature.appinfos.impl"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.appbrowser"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -30,20 +27,22 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
 
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.material)
 
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+    implementation(dependencyNotation = project(":commons"))
+    implementation(dependencyNotation = project(":data-appinfos-api"))
+    implementation(dependencyNotation = project(":feature-appinfos-api"))
+    implementation(dependencyNotation = project(":feature-commons-api"))
+    implementation(dependencyNotation = project(":feature-commons-impl"))
 }
