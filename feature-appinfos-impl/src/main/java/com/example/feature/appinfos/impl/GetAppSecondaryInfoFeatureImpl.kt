@@ -11,7 +11,7 @@ import com.example.feature.appinfos.api.model.ApkSum
 import com.example.feature.appinfos.api.model.AppSecondaryInfo
 import com.example.feature.appinfos.impl.alias.AppInfos
 import com.example.feature.appinfos.impl.extensions.toAppSecondaryInfo
-import com.example.feature.commons.impl.FeatureImpl
+import com.example.feature.commons.impl.FlowFeatureImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.transform
 
 internal class GetAppSecondaryInfoFeatureImpl(
     appInfosRepo: AppInfosRepo,
-): FeatureImpl<AppPackageName, AppSecondaryInfo>(),
+): FlowFeatureImpl<AppPackageName, AppSecondaryInfo>(),
    GetAppSecondaryInfoFeature {
 
 // MARK: - Methods

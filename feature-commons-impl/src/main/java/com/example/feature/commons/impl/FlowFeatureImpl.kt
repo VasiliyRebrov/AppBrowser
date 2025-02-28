@@ -1,14 +1,14 @@
 package com.example.feature.commons.impl
 
 import com.example.commons.result.Result
-import com.example.feature.commons.api.Feature
+import com.example.feature.commons.api.FlowFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 
-@Deprecated("Consider to merge with 'Feature'.")
-abstract class FeatureImpl<in Ti, out To>: Feature<Ti, To> {
+@Deprecated("Consider to merge with 'FlowFeature'.")
+abstract class FlowFeatureImpl<in Ti, out To>: FlowFeature<Ti, To> {
 
 // MARK: - Properties
 
