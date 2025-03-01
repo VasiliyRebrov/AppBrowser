@@ -2,17 +2,15 @@ package com.example.feature.appinfos.impl
 
 import android.util.Log
 import com.example.commons.result.Result
+import com.example.data.appinfos.api.alias.AppInfos
 import com.example.data.appinfos.api.repo.AppInfosRepo
 import com.example.feature.appinfos.api.GetAppPrimaryInfosFeature
 import com.example.feature.appinfos.api.error.AppInfosError
-import com.example.feature.appinfos.api.model.AppPrimaryInfo
-import com.example.feature.appinfos.impl.alias.AppInfos
+import com.example.feature.appinfos.impl.alias.AppPrimaryInfos
 import com.example.feature.appinfos.impl.extensions.toAppPrimaryInfos
 import com.example.feature.commons.impl.FlowFeatureImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-
-typealias AppPrimaryInfos = List<AppPrimaryInfo>
 
 internal class GetAppPrimaryInfosFeatureImpl(
     appInfosRepo: AppInfosRepo,

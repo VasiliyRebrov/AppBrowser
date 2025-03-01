@@ -1,7 +1,7 @@
 package com.example.feature.appinfos.impl.extensions
 
-import com.example.feature.appinfos.impl.AppPrimaryInfos
-import com.example.feature.appinfos.impl.alias.AppInfos
+import com.example.data.appinfos.api.alias.AppInfos
+import com.example.feature.appinfos.impl.alias.AppPrimaryInfos
 
 // MARK: - Methods
 

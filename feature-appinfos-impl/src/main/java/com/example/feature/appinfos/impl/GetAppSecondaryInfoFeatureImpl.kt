@@ -3,13 +3,13 @@ package com.example.feature.appinfos.impl
 import android.util.Log
 import com.example.commons.model.AppPackageName
 import com.example.commons.result.Result
+import com.example.data.appinfos.api.alias.AppInfos
 import com.example.data.appinfos.api.model.AppInfo
 import com.example.data.appinfos.api.repo.AppInfosRepo
 import com.example.feature.appinfos.api.GetAppSecondaryInfoFeature
 import com.example.feature.appinfos.api.error.AppInfosError
 import com.example.feature.appinfos.api.model.ApkSum
 import com.example.feature.appinfos.api.model.AppSecondaryInfo
-import com.example.feature.appinfos.impl.alias.AppInfos
 import com.example.feature.appinfos.impl.extensions.toAppSecondaryInfo
 import com.example.feature.commons.impl.FlowFeatureImpl
 import kotlinx.coroutines.flow.Flow

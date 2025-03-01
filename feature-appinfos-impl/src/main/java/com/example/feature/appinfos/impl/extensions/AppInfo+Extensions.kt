@@ -10,7 +10,6 @@ internal fun AppInfo.toAppPrimaryInfo(): AppPrimaryInfo {
     return AppPrimaryInfo(
         name = this.name,
         packageName = this.packageName,
-        icon = this.icon,
     )
 }
 
@@ -19,6 +18,5 @@ internal fun AppInfo.toAppSecondaryInfo(): AppSecondaryInfo {
         name = this.name,
         packageName = this.packageName,
         version = this.version,
-        icon = this.icon,
     )
 }
