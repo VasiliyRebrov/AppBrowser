@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.commons"
+    namespace = "com.example.feature.commons"
     compileSdk = 35
 
     defaultConfig {
@@ -34,10 +34,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
-    implementation(libs.koin.android)
 
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+    implementation(dependencyNotation = project(":commons"))
 }

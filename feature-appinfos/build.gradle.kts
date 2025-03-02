@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.commons"
+    namespace = "com.example.feature.appinfos"
     compileSdk = 35
 
     defaultConfig {
@@ -40,4 +40,8 @@ dependencies {
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+
+    implementation(dependencyNotation = project(":commons"))
+    implementation(dependencyNotation = project(":data-appinfos"))
+    implementation(dependencyNotation = project(":feature-commons"))
 }
