@@ -5,8 +5,8 @@ import com.example.commons.result.Result
 import com.example.data.appinfos.api.alias.AppInfos
 import com.example.data.appinfos.api.repo.AppInfosRepo
 import com.example.feature.appinfos.api.GetAppPrimaryInfosFeature
-import com.example.feature.appinfos.api.error.AppInfosError
 import com.example.feature.appinfos.api.alias.AppPrimaryInfos
+import com.example.feature.appinfos.api.error.AppInfosFeatureError
 import com.example.feature.appinfos.impl.extensions.toAppPrimaryInfos
 import com.example.feature.commons.impl.FlowFeatureImpl
 import kotlinx.coroutines.flow.Flow
@@ -27,21 +27,14 @@ internal class GetAppPrimaryInfosFeatureImpl(
 
     private fun transform(result: Result<AppInfos>): Result<AppPrimaryInfos> {
         return result.fold(
-            onSuccess = this::handleSuccess,
-            onError = this::handleError,
+            onSuccess = { appInfos ->
+                Result.success(data = appInfos.toAppPrimaryInfos())
+            },
+            onError = { th ->
+                Log.w(TAG, th)
+                Result.error(th = AppInfosFeatureError.internalError())
+            },
         )
-    }
-
-    private fun handleSuccess(appInfos: AppInfos): Result<AppPrimaryInfos> {
-        return when (appInfos.isNotEmpty()) {
-            true -> Result.success(data = appInfos.toAppPrimaryInfos())
-            else -> Result.error(throwable = AppInfosError.internalError())
-        }
-    }
-
-    private fun handleError(throwable: Throwable): Result<AppPrimaryInfos> {
-        Log.w(TAG, throwable)
-        return Result.error(throwable = AppInfosError.internalError())
     }
 
 // MARK: - Companion

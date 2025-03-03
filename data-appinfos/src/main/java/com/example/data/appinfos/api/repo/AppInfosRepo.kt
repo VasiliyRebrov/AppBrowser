@@ -3,15 +3,16 @@ package com.example.data.appinfos.api.repo
 import com.example.commons.model.AppPackageName
 import com.example.commons.result.Result
 import com.example.data.appinfos.api.alias.AppInfos
-import kotlinx.coroutines.flow.StateFlow
+import com.example.data.appinfos.api.model.AppInfo
+import kotlinx.coroutines.flow.Flow
 
 interface AppInfosRepo {
 
 // MARK: - Methods
 
-    fun getAppInfosPublisher(): StateFlow<Result<AppInfos>>
+    fun getAppInfoPublisher(appPackageName: AppPackageName): Flow<Result<AppInfo>>
 
-    fun updateAppInfo(appPackageName: AppPackageName)
+    fun getAppInfosPublisher(): Flow<Result<AppInfos>>
 
-    fun updateAppInfos()
+    fun ensureAppInfosAsync()
 }

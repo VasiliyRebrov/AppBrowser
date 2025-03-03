@@ -1,91 +1,173 @@
 package com.example.data.appinfos.impl.repo
 
+import android.util.Log
 import com.example.commons.model.AppPackageName
 import com.example.commons.result.Result
 import com.example.data.appinfos.api.alias.AppInfos
+import com.example.data.appinfos.api.error.AppInfosDataError
 import com.example.data.appinfos.api.model.AppInfo
 import com.example.data.appinfos.api.repo.AppInfosRepo
 import com.example.data.appinfos.impl.datasource.AppInfosDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfosRepo {
 
-// MARK: - Construction
-
-    init {
-        updateAppInfos()
-    }
-
 // MARK: - Methods
 
-    override fun getAppInfosPublisher(): StateFlow<Result<AppInfos>> {
-        return _appInfoPublisher.asStateFlow()
-    }
-
-    override fun updateAppInfo(appPackageName: AppPackageName) {
-        _ioScope.launch {
-            _mutex.withLock {
-
-                _appInfoPublisher.value = Result.loading()
-
-                try {
-                    val appInfo = _appInfosDataSource.getAppInfo(appPackageName)
-                    when (appInfo) {
-                        null -> _appInfosMap.remove(appPackageName)
-                        else -> _appInfosMap[appPackageName] = appInfo
+    override fun getAppInfoPublisher(appPackageName: AppPackageName): Flow<Result<AppInfo>> {
+        return _publisher
+            .map { result ->
+                when (result) {
+                    is Result.Success -> {
+                        val appInfo = result.data[appPackageName]
+                        when (appInfo) {
+                            null -> Result.error(th = AppInfosDataError.notFound())
+                            else -> Result.success(data = appInfo)
+                        }
                     }
-
-                    _appInfoPublisher.value = Result.success(_appInfos)
+                    is Result.Error -> {
+                        result
+                    }
+                    is Result.Loading -> {
+                        result
+                    }
                 }
-                catch (ex: Exception) {
-                    _appInfoPublisher.value = Result.error(ex)
+            }
+            .distinctUntilChanged { oldResult, newResult ->
+                when (newResult) {
+                    is Result.Success -> (oldResult.successData == newResult.data)
+                    is Result.Error -> false
+                    is Result.Loading -> (oldResult is Result.Loading)
+                }
+            }
+
+    }
+
+    override fun getAppInfosPublisher(): Flow<Result<AppInfos>> {
+        return _publisher.map { result ->
+            when (result) {
+                is Result.Success -> {
+                    val appInfos = result.data.values
+                    require(appInfos.isNotEmpty()) { "appInfos is empty" }
+
+                    Result.success(data = appInfos)
+                }
+                is Result.Error -> {
+                    result
+                }
+                is Result.Loading -> {
+                    result
                 }
             }
         }
     }
 
-    override fun updateAppInfos() {
+    override fun ensureAppInfosAsync() {
         _ioScope.launch {
             _mutex.withLock {
 
-                _appInfoPublisher.value = Result.loading()
+                _publisher.value = Result.loading()
 
                 try {
-                    val appInfos = _appInfosDataSource.getAppInfos()
-
-                    _appInfosMap.clear()
-                    _appInfosMap.putAll(appInfos)
-
-                    _appInfoPublisher.value = Result.success(_appInfos)
+                    val appInfos = _dataSource.getAppInfos()
+                    when (appInfos.isNotEmpty()) {
+                        true -> updateAppInfos(appInfos)
+                        else -> clearAppInfos()
+                    }
                 }
                 catch (ex: Exception) {
-                    _appInfoPublisher.value = Result.error(ex)
+                    Log.w(TAG, ex)
+                    clearAppInfos()
                 }
             }
         }
+    }
+
+// MARK: - Private Methods
+
+    private fun updateAppInfoAsync(appPackageName: AppPackageName) {
+        _ioScope.launch {
+            _mutex.withLock {
+
+                if (_cacheEnsured) {
+                    try {
+                        val appInfo = _dataSource.getAppInfo(appPackageName)
+                        when (appInfo) {
+                            null -> removeAppInfo(appPackageName)
+                            else -> updateAppInfo(appPackageName, appInfo)
+                        }
+                    }
+                    catch (ex: Exception) {
+                        Log.w(TAG, ex)
+                        removeAppInfo(appPackageName)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun removeAppInfoAsync(appPackageName: AppPackageName) {
+        _ioScope.launch {
+            _mutex.withLock {
+                if (_cacheEnsured) {
+                    removeAppInfo(appPackageName)
+                }
+            }
+        }
+    }
+
+    private fun updateAppInfos(appInfos: Map<AppPackageName, AppInfo>) {
+        _cache.clear()
+        _cache.putAll(appInfos)
+
+        _publisher.value = Result.success(data = _cache.toMap())
+    }
+
+    private fun updateAppInfo(appPackageName: AppPackageName, appInfo: AppInfo) {
+        _cache[appPackageName] = appInfo
+        _publisher.value = Result.success(data = _cache.toMap())
+    }
+
+    private fun removeAppInfo(appPackageName: AppPackageName) {
+        _cache.remove(appPackageName)?.let {
+            _publisher.value = Result.success(data = _cache.toMap())
+        }
+    }
+
+    private fun clearAppInfos() {
+        _cache.clear()
+        _publisher.value = Result.error(th = AppInfosDataError.internalError())
+    }
+
+// MARK: - Companion
+
+    companion object {
+        private val TAG = AppInfosRepoImpl::class.java.simpleName
     }
 
 // MARK: - Variables
 
-    private val _appInfosDataSource: AppInfosDataSource = appInfosDataSource
+    private val _dataSource: AppInfosDataSource = appInfosDataSource
 
     private val _mutex: Mutex = Mutex()
 
     private val _ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private val _appInfosMap: MutableMap<AppPackageName, AppInfo> = mutableMapOf()
+    private val _cache: MutableMap<AppPackageName, AppInfo> = mutableMapOf()
 
-    private val _appInfoPublisher: MutableStateFlow<Result<AppInfos>> by lazy {
+    private val _publisher: MutableStateFlow<Result<Map<AppPackageName, AppInfo>>> by lazy {
+        ensureAppInfosAsync()
         MutableStateFlow(value = Result.loading())
     }
 
-    private inline val _appInfos: AppInfos
-        get() = _appInfosMap.values
+    private inline val _cacheEnsured: Boolean
+        get() = _cache.isNotEmpty()
 }

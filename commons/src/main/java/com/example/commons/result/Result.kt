@@ -13,13 +13,13 @@ sealed class Result<out To> {
 
     inline fun <R> fold(
         onSuccess: (value: To) -> Result<R>,
-        onError: (throwable: Throwable) -> Result<R> = ::error,
+        onError: (th: Throwable) -> Result<R> = ::error,
         onLoading: () -> Result<R> = ::loading,
     ): Result<R> {
 
         return when (this) {
             is Success -> onSuccess(this.data)
-            is Error -> onError(this.throwable)
+            is Error -> onError(this.th)
             is Loading -> onLoading()
         }
     }
@@ -27,7 +27,7 @@ sealed class Result<out To> {
     override fun toString(): String {
         return when (this) {
             is Success<*> -> "Success[data=${this.data}]"
-            is Error -> "Error[throwable=${this.throwable}]"
+            is Error -> "Error[th=${this.th}]"
             is Loading -> "Loading"
         }
     }
@@ -36,7 +36,7 @@ sealed class Result<out To> {
 
     data class Success<out To>(val data: To): Result<To>()
 
-    data class Error(val throwable: Throwable): Result<Nothing>()
+    class Error(val th: Throwable): Result<Nothing>()
 
     object Loading: Result<Nothing>()
 
@@ -48,8 +48,8 @@ sealed class Result<out To> {
             return Success(data)
         }
 
-        inline fun error(throwable: Throwable): Error {
-            return Error(throwable)
+        inline fun error(th: Throwable): Error {
+            return Error(th)
         }
 
         inline fun loading(): Loading {

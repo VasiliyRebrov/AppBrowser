@@ -1,14 +1,12 @@
 package com.example.feature.appinfos.api.error
 
-import com.example.feature.commons.api.error.FeatureError
-
-sealed class AppInfosError: FeatureError() {
+sealed class AppInfosFeatureError: Error() {
 
 // MARK: - Inner Types
 
-    data object InternalError: AppInfosError()
+    data object InternalError: AppInfosFeatureError()
 
-    data object NotFound: AppInfosError()
+    data object NotFound: AppInfosFeatureError()
 
 // MARK: - Companion
 

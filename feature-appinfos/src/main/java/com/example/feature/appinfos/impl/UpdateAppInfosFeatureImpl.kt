@@ -12,7 +12,7 @@ internal class UpdateAppInfosFeatureImpl(
 // MARK: - Methods
 
     override suspend fun execute(params: Unit) {
-        _appInfosRepo.updateAppInfos()
+        _appInfosRepo.ensureAppInfosAsync()
     }
 
 // MARK: - Variables

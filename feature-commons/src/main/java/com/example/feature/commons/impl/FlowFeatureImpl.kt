@@ -17,7 +17,7 @@ abstract class FlowFeatureImpl<in Ti, out To>: FlowFeature<Ti, To> {
 
     override fun invoke(params: Ti): Flow<Result<To>> {
         return execute(params)
-            .catch { throwable -> emit(value = Result.error(throwable)) }
+            .catch { th -> emit(value = Result.error(th)) }
             .flowOn(this.coroutineDispatcher)
     }
 

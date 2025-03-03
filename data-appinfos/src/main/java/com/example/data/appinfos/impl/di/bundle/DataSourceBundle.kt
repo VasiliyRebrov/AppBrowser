@@ -1,6 +1,6 @@
 package com.example.data.appinfos.impl.di.bundle
 
-import android.content.pm.PackageManager
+import android.content.Context
 import com.example.commons.di.KoinModuleBundle
 import com.example.data.appinfos.impl.datasource.AppInfosDataSource
 import com.example.data.appinfos.impl.datasource.AppInfosDataSourceImpl
@@ -14,7 +14,7 @@ internal object DataSourceBundle: KoinModuleBundle {
     override val module: Module = module {
         single<AppInfosDataSource> {
             AppInfosDataSourceImpl(
-                get<PackageManager>(),
+                get<Context>().packageManager,
             )
         }
     }
