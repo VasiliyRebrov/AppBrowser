@@ -20,8 +20,8 @@ abstract class CoroutineFeatureImpl<in Ti, out To>: CoroutineFeature<Ti, To> {
                 Result.success(data)
             }
         }
-        catch (th: Throwable) {
-            Result.error(th)
+        catch (throwable: Throwable) {
+            Result.error(throwable)
         }
     }
 

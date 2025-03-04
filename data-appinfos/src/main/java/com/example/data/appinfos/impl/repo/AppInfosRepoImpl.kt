@@ -1,6 +1,5 @@
 package com.example.data.appinfos.impl.repo
 
-import android.util.Log
 import com.example.commons.model.AppPackageName
 import com.example.commons.result.Result
 import com.example.data.appinfos.api.alias.AppInfos
@@ -10,6 +9,7 @@ import com.example.data.appinfos.api.repo.AppInfosRepo
 import com.example.data.appinfos.impl.datasource.AppInfosDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,7 +29,7 @@ internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfo
                     is Result.Success -> {
                         val appInfo = result.data[appPackageName]
                         when (appInfo) {
-                            null -> Result.error(th = AppInfosDataError.notFound())
+                            null -> Result.error(throwable = AppInfosDataError.notFound())
                             else -> Result.success(data = appInfo)
                         }
                     }
@@ -56,8 +56,6 @@ internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfo
             when (result) {
                 is Result.Success -> {
                     val appInfos = result.data.values
-                    require(appInfos.isNotEmpty()) { "appInfos is empty" }
-
                     Result.success(data = appInfos)
                 }
                 is Result.Error -> {
@@ -76,16 +74,35 @@ internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfo
 
                 _publisher.value = Result.loading()
 
-                try {
-                    val appInfos = _dataSource.getAppInfos()
-                    when (appInfos.isNotEmpty()) {
-                        true -> updateAppInfos(appInfos)
-                        else -> clearAppInfos()
+                val appInfos = _dataSource.getAppInfos()
+                when (appInfos.isNotEmpty()) {
+                    true -> updateAppInfos(appInfos)
+                    else -> clearAppInfos()
+                }
+            }
+        }
+    }
+
+    override fun updateAppInfoAsync(appPackageName: AppPackageName) {
+        _ioScope.launch {
+            _mutex.withLock {
+
+                if (_isCacheEnsured) {
+                    val appInfo = _dataSource.getAppInfo(appPackageName)
+                    when (appInfo) {
+                        null -> removeAppInfo(appPackageName)
+                        else -> updateAppInfo(appPackageName, appInfo)
                     }
                 }
-                catch (ex: Exception) {
-                    Log.w(TAG, ex)
-                    clearAppInfos()
+            }
+        }
+    }
+
+    override fun removeAppInfoAsync(appPackageName: AppPackageName) {
+        _ioScope.launch {
+            _mutex.withLock {
+                if (_isCacheEnsured) {
+                    removeAppInfo(appPackageName)
                 }
             }
         }
@@ -93,46 +110,15 @@ internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfo
 
 // MARK: - Private Methods
 
-    private fun updateAppInfoAsync(appPackageName: AppPackageName) {
-        _ioScope.launch {
-            _mutex.withLock {
-
-                if (_cacheEnsured) {
-                    try {
-                        val appInfo = _dataSource.getAppInfo(appPackageName)
-                        when (appInfo) {
-                            null -> removeAppInfo(appPackageName)
-                            else -> updateAppInfo(appPackageName, appInfo)
-                        }
-                    }
-                    catch (ex: Exception) {
-                        Log.w(TAG, ex)
-                        removeAppInfo(appPackageName)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun removeAppInfoAsync(appPackageName: AppPackageName) {
-        _ioScope.launch {
-            _mutex.withLock {
-                if (_cacheEnsured) {
-                    removeAppInfo(appPackageName)
-                }
-            }
-        }
+    private fun updateAppInfo(appPackageName: AppPackageName, appInfo: AppInfo) {
+        _cache[appPackageName] = appInfo
+        _publisher.value = Result.success(data = _cache.toMap())
     }
 
     private fun updateAppInfos(appInfos: Map<AppPackageName, AppInfo>) {
         _cache.clear()
         _cache.putAll(appInfos)
 
-        _publisher.value = Result.success(data = _cache.toMap())
-    }
-
-    private fun updateAppInfo(appPackageName: AppPackageName, appInfo: AppInfo) {
-        _cache[appPackageName] = appInfo
         _publisher.value = Result.success(data = _cache.toMap())
     }
 
@@ -144,30 +130,24 @@ internal class AppInfosRepoImpl(appInfosDataSource: AppInfosDataSource): AppInfo
 
     private fun clearAppInfos() {
         _cache.clear()
-        _publisher.value = Result.error(th = AppInfosDataError.internalError())
-    }
-
-// MARK: - Companion
-
-    companion object {
-        private val TAG = AppInfosRepoImpl::class.java.simpleName
+        _publisher.value = Result.error(throwable = AppInfosDataError.internal())
     }
 
 // MARK: - Variables
 
     private val _dataSource: AppInfosDataSource = appInfosDataSource
 
+    private val _cache: MutableMap<AppPackageName, AppInfo> = mutableMapOf()
+
     private val _mutex: Mutex = Mutex()
 
-    private val _ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-
-    private val _cache: MutableMap<AppPackageName, AppInfo> = mutableMapOf()
+    private val _ioScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _publisher: MutableStateFlow<Result<Map<AppPackageName, AppInfo>>> by lazy {
         ensureAppInfosAsync()
         MutableStateFlow(value = Result.loading())
     }
 
-    private inline val _cacheEnsured: Boolean
+    private inline val _isCacheEnsured: Boolean
         get() = _cache.isNotEmpty()
 }

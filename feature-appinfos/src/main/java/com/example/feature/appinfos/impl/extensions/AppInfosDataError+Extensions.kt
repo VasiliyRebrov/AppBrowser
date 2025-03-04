@@ -7,7 +7,7 @@ import com.example.feature.appinfos.api.error.AppInfosFeatureError
 
 internal fun AppInfosDataError.toAppInfosFeatureError(): AppInfosFeatureError {
     return when (this) {
-        is AppInfosDataError.InternalError -> AppInfosFeatureError.internalError()
+        is AppInfosDataError.Internal -> AppInfosFeatureError.internal()
         is AppInfosDataError.NotFound -> AppInfosFeatureError.notFound()
     }
 }

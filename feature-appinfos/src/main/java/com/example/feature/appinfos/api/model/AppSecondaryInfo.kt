@@ -8,5 +8,5 @@ data class AppSecondaryInfo(
     val name: AppName,
     val packageName: AppPackageName,
     val version: AppVersion,
-    val apkSum: ApkSum? = null,
+    val apkHash: ApkHash? = null,
 )

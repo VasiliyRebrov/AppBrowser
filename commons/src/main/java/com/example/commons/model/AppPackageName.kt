@@ -1,9 +1,12 @@
 package com.example.commons.model
 
-import com.example.commons.kotlin.requireNotBlank
+import android.os.Parcelable
+import com.example.commons.utils.requireNotBlank
+import kotlinx.parcelize.Parcelize
 
 @JvmInline
-value class AppPackageName(val rawValue: String) {
+@Parcelize
+value class AppPackageName(val rawValue: String): Parcelable {
 
 // MARK: - Construction
 

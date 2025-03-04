@@ -13,7 +13,6 @@ internal class AppInfosDataSourceImpl(packageManager: PackageManager): AppInfosD
 
     override fun getAppInfo(appPackageName: AppPackageName): AppInfo? {
         return _packageManager.getLaunchIntentForPackage(appPackageName.rawValue)?.let {
-
             try {
                 _packageManager
                     .getApplicationInfo(appPackageName.rawValue, PackageManager.GET_META_DATA)
@@ -28,12 +27,15 @@ internal class AppInfosDataSourceImpl(packageManager: PackageManager): AppInfosD
 
     override fun getAppInfos(): Map<AppPackageName, AppInfo> {
         return buildMap {
-
             _packageManager.getInstalledApplications(PackageManager.GET_META_DATA).forEach { applicationInfo ->
-
                 _packageManager.getLaunchIntentForPackage(applicationInfo.packageName)?.let {
-                    val appInfo = applicationInfo.toAppInfo(_packageManager)
-                    this[appInfo.packageName] = appInfo
+                    try {
+                        val appInfo = applicationInfo.toAppInfo(_packageManager)
+                        this[appInfo.packageName] = appInfo
+                    }
+                    catch (ex: NameNotFoundException) {
+                        Log.w(TAG, ex)
+                    }
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.example.commons.model
 
-import com.example.commons.kotlin.requireNotBlank
+import com.example.commons.utils.requireNotBlank
 
 @JvmInline
 value class AppVersion(val rawValue: String) {

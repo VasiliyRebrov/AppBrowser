@@ -15,4 +15,8 @@ interface AppInfosRepo {
     fun getAppInfosPublisher(): Flow<Result<AppInfos>>
 
     fun ensureAppInfosAsync()
+
+    fun updateAppInfoAsync(appPackageName: AppPackageName)
+
+    fun removeAppInfoAsync(appPackageName: AppPackageName)
 }

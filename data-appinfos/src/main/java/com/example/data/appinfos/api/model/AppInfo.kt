@@ -8,4 +8,5 @@ data class AppInfo(
     val name: AppName,
     val packageName: AppPackageName,
     val version: AppVersion,
+    val apkPath: ApkPath,
 )

@@ -1,10 +1,14 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package com.example.feature.appinfos.api.error
 
 sealed class AppInfosFeatureError: Error() {
 
 // MARK: - Inner Types
 
-    data object InternalError: AppInfosFeatureError()
+    data object ApkHashCalculation: AppInfosFeatureError()
+
+    data object Internal: AppInfosFeatureError()
 
     data object NotFound: AppInfosFeatureError()
 
@@ -12,11 +16,15 @@ sealed class AppInfosFeatureError: Error() {
 
     companion object {
 
-        fun internalError(): InternalError {
-            return InternalError
+        inline fun apkHashCalculation(): ApkHashCalculation {
+            return ApkHashCalculation
         }
 
-        fun notFound(): NotFound {
+        inline fun internal(): Internal {
+            return Internal
+        }
+
+        inline fun notFound(): NotFound {
             return NotFound
         }
     }

@@ -30,9 +30,12 @@ internal class GetAppPrimaryInfosFeatureImpl(
             onSuccess = { appInfos ->
                 Result.success(data = appInfos.toAppPrimaryInfos())
             },
-            onError = { th ->
-                Log.w(TAG, th)
-                Result.error(th = AppInfosFeatureError.internalError())
+            onError = { throwable ->
+                Log.w(TAG, throwable)
+                Result.error(throwable = AppInfosFeatureError.internal())
+            },
+            onLoading = {
+                Result.loading()
             },
         )
     }

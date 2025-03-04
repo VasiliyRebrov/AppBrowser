@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="text_app_browser">AppBrowser</string>
+    <string name="text_app_cannot_be_launched">Приложение не может быть запущено</string>
+    <string name="text_apk_control_sum">Контрольная сумма APK (%s)</string>
+    <string name="text_app_not_found">Приложение не найдено</string>
+    <string name="text_error_of_apk_control_sum_calculating">Ошибка вычисления контрольной суммы APK</string>
+    <string name="text_internal_error_occurred">Произошла внутренняя ошибка</string>
+    <string name="text_package">Пакет</string>
+    <string name="text_retry">Повторить</string>
+    <string name="text_version">Версия</string>
+</resources>

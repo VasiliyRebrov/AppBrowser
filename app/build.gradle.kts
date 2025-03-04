@@ -30,24 +30,19 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.koin.android)
 
     testImplementation(libs.junit)
 
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(project(":commons"))
-    implementation(project(":feature-appinfos"))
+    implementation(dependencyNotation = project(":commons"))
+    implementation(dependencyNotation = project(":data-appinfos"))
+    implementation(dependencyNotation = project(":presentation"))
 }

@@ -1,11 +1,12 @@
-package com.example.data.appinfos.api.error
+@file:Suppress("NOTHING_TO_INLINE")
 
+package com.example.data.appinfos.api.error
 
 sealed class AppInfosDataError: Error() {
 
 // MARK: - Inner Types
 
-    data object InternalError: AppInfosDataError()
+    data object Internal: AppInfosDataError()
 
     data object NotFound: AppInfosDataError()
 
@@ -13,11 +14,11 @@ sealed class AppInfosDataError: Error() {
 
     companion object {
 
-        fun internalError(): InternalError {
-            return InternalError
+        inline fun internal(): Internal {
+            return Internal
         }
 
-        fun notFound(): NotFound {
+        inline fun notFound(): NotFound {
             return NotFound
         }
     }

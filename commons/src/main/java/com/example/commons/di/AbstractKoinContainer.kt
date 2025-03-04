@@ -1,7 +1,6 @@
 package com.example.commons.di
 
 import org.koin.core.context.loadKoinModules
-import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class AbstractKoinContainer: KoinModuleLoader {
 
@@ -14,19 +13,13 @@ abstract class AbstractKoinContainer: KoinModuleLoader {
 // MARK: - Methods
 
     override fun loadModules() {
-        if (_bootScopeLoaded.compareAndSet(false, true)) {
 
-            this.koinModuleLoaders.forEach { loader ->
-                loader.loadModules()
-            }
+        this.koinModuleLoaders.forEach { loader ->
+            loader.loadModules()
+        }
 
-            this.koinModuleBundles.forEach { bundle ->
-                loadKoinModules(bundle.module)
-            }
+        this.koinModuleBundles.forEach { bundle ->
+            loadKoinModules(bundle.module)
         }
     }
-
-// MARK: - Variables
-
-    private val _bootScopeLoaded: AtomicBoolean = AtomicBoolean(false)
 }

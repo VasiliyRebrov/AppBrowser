@@ -6,7 +6,5 @@ import com.example.feature.appinfos.api.alias.AppPrimaryInfos
 // MARK: - Methods
 
 internal fun AppInfos.toAppPrimaryInfos(): AppPrimaryInfos {
-    return this
-        .map { it.toAppPrimaryInfo() }
-        .sortedBy { it.name.rawValue }
+    return this.map { it.toAppPrimaryInfo() }
 }
