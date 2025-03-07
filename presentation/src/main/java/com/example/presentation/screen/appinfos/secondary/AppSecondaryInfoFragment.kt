@@ -98,8 +98,8 @@ internal class AppSecondaryInfoFragment:
     }
 
     private fun handleContentState(viewState: AppSecondaryInfoViewState.Content) {
-        val ignoreApkHash = viewState.ignoreApkHash
         val (_, appPackageName, appVersion, apkHash) = viewState.appSecondaryInfo
+        val ignoreApkHash = viewState.ignoreApkHash
 
         handleAppVersionContentState(appVersion)
         handleAppPackageNameContentState(appPackageName)
